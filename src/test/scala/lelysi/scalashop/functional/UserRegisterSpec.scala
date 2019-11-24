@@ -1,7 +1,6 @@
 package lelysi.scalashop.functional
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
-import akka.http.scaladsl.server.Directives
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import lelysi.scalashop.{JsonSupport, ShopRoute}
 import org.scalatest._
@@ -10,7 +9,6 @@ class UserRegisterSpec extends WordSpec
   with Matchers
   with ScalatestRouteTest
   with JsonSupport
-  with Directives
   with ShopRoute {
 
   val entity = HttpEntity(
