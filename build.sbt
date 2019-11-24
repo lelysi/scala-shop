@@ -11,4 +11,4 @@ lazy val root = (project in file("."))
     libraryDependencies += scalaTest % Test
   )
 
-// See https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html for instructions on how to publish to Sonatype.
+libraryDependencies ++= Seq(akkaHttp, akkaStream, akkaStreamTestKit, akkaHttpTestKit)
