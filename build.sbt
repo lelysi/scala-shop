@@ -11,4 +11,4 @@ lazy val root = (project in file("."))
     libraryDependencies += scalaTest % Test
   )
 
-libraryDependencies ++= Seq(akkaHttp, akkaStream, akkaStreamTestKit, akkaHttpTestKit)
+libraryDependencies ++= Seq(akkaHttp, akkaStream, akkaStreamTestKit, akkaHttpTestKit, akkaSpray)

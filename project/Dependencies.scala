@@ -9,4 +9,6 @@ object Dependencies {
   lazy val akkaStream = "com.typesafe.akka" %% "akka-stream" % akkaVersion
   lazy val akkaStreamTestKit = "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion
   lazy val akkaHttpTestKit = "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion
+//  lazy val spray = "io.spray" %%  "spray-json" % "1.3.5"
+  lazy val akkaSpray = "com.typesafe.akka" %%  "akka-http-spray-json" % akkaHttpVersion
 }
