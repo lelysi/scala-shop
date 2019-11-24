@@ -16,8 +16,7 @@ object ScalaShopMain extends App
 
   val port = 8080
 
-  val bindingFuture =
-    Http().bindAndHandle(Route.handlerFlow(userRegistration), "localhost", port)
+  val bindingFuture = Http().bindAndHandle(Route.handlerFlow(userRegistration), "localhost", port)
 
   log.info(s"Server started at the port $port")
 }

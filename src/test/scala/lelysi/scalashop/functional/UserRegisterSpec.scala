@@ -24,6 +24,11 @@ class UserRegisterSpec extends WordSpec
     """{ "password" : "pass" }"""
   )
 
+  lazy val incorrectEmailEntity = HttpEntity(
+    ContentTypes.`application/json`,
+    """{ "email": "@example.com", "password" : "pass" }"""
+  )
+
   "User Register Service" should {
     "return 200 for correct register data" in {
       Post(url, correctEntity) ~> userRegistration ~> check {
@@ -34,6 +39,12 @@ class UserRegisterSpec extends WordSpec
 
     "return 400 for incorrect register data" in {
       Post(url, incorrectEntity) ~> Route.seal(userRegistration) ~> check {
+        status shouldEqual StatusCodes.BadRequest
+      }
+    }
+
+    "return 400 for not correct email data" in {
+      Post(url, incorrectEmailEntity) ~> Route.seal(userRegistration) ~> check {
         status shouldEqual StatusCodes.BadRequest
       }
     }
