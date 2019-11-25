@@ -7,9 +7,7 @@ import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 
-object ScalaShopMain extends App
-  with JsonSupport
-  with ShopRoute {
+object ScalaShopMain extends App {
 
   val config = ConfigFactory.load()
   val host = config.getString("http.host")
@@ -19,7 +17,9 @@ object ScalaShopMain extends App
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val log: LoggingAdapter = Logging(system, "main")
 
-  val bindingFuture = Http().bindAndHandle(Route.handlerFlow(userRegistration), host, port)
+  val api = new ShopApi(system)
+
+  val bindingFuture = Http().bindAndHandle(Route.handlerFlow(api.userRegistration), host, port)
 
   log.info(s"Server started at the port $port")
 }
