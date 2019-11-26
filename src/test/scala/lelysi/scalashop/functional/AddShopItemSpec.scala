@@ -5,6 +5,8 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import lelysi.scalashop.ShopApi
 import org.scalatest._
+import akka.util.Timeout
+import scala.concurrent.duration._
 
 class AddShopItemSpec extends WordSpec
   with Matchers
@@ -12,7 +14,7 @@ class AddShopItemSpec extends WordSpec
 
   val url: String = "/add-shop-item"
 
-  val route: Route = new ShopApi(system).addShopItem
+  val route: Route = new ShopApi(system, Timeout(3.second)).addShopItem
 
   lazy val correctEntity = HttpEntity(
     ContentTypes.`application/json`,

@@ -3,8 +3,10 @@ package lelysi.scalashop.functional
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import lelysi.scalashop.{ShopApi}
+import akka.util.Timeout
+import lelysi.scalashop.ShopApi
 import org.scalatest._
+import scala.concurrent.duration._
 
 class UserRegisterSpec extends WordSpec
   with Matchers
@@ -12,7 +14,7 @@ class UserRegisterSpec extends WordSpec
 
   val url: String = "/registration"
 
-  val route: Route = new ShopApi(system).userRegistration
+  val route: Route = new ShopApi(system, Timeout(3.second)).userRegistration
 
   lazy val correctEntity = HttpEntity(
     ContentTypes.`application/json`,

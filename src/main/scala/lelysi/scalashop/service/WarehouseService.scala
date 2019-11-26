@@ -7,11 +7,10 @@ import lelysi.scalashop.service.WarehouseService.{AddItem, ItemAdded}
 import scala.collection.mutable
 
 object WarehouseService {
-  def props: Props = Props(new WarehouseService)
-
   case class AddItem(shopItem: ShopItem)
 
-  case class ItemAdded()
+  sealed trait WarehouseServiceResponse
+  case object ItemAdded extends WarehouseServiceResponse
 }
 
 class WarehouseService extends Actor {
@@ -23,6 +22,6 @@ class WarehouseService extends Actor {
         case Some(elem) => shopItemRepository.update(shopItem, elem + 1)
         case None => shopItemRepository(shopItem) = 1
       }
-      sender() ! ItemAdded()
+      sender() ! ItemAdded
   }
 }
