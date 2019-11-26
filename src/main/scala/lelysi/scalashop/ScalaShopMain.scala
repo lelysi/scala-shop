@@ -19,7 +19,7 @@ object ScalaShopMain extends App {
 
   val api = new ShopApi(system)
 
-  val bindingFuture = Http().bindAndHandle(Route.handlerFlow(api.userRegistration), host, port)
+  val bindingFuture = Http().bindAndHandle(Route.handlerFlow(api.routes), host, port)
 
   log.info(s"Server started at the port $port")
 }
