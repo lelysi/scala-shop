@@ -11,7 +11,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 trait RequestTimeout {
   import scala.concurrent.duration._
   def requestTimeout(config: Config): Timeout = {
-    val t = config.getString("spray.can.server.request-timeout")
+    val t = config.getString("requestTimeout")
     val d = Duration(t)
     FiniteDuration(d.length, d.unit)
   }
