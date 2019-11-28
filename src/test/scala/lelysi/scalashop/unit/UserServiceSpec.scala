@@ -5,7 +5,7 @@ import akka.testkit.{ImplicitSender, TestKit}
 import lelysi.scalashop.StopSystemAfterAll
 import lelysi.scalashop.model.User
 import lelysi.scalashop.service.UserService
-import lelysi.scalashop.service.UserService.{EmailAlreadyUsed, RegisterUser, UserRegistered}
+import lelysi.scalashop.service.UserService.{AuthUser, EmailAlreadyUsed, RegisterUser, UserFound, UserRegistered, UserUnknown}
 import org.scalatest.WordSpecLike
 
 class UserServiceSpec extends TestKit(ActorSystem("test-spec"))
@@ -22,6 +22,14 @@ class UserServiceSpec extends TestKit(ActorSystem("test-spec"))
     "send already exists message on duplication" in {
       userService ! RegisterUser(User("example@example.com", "pass"))
       expectMsg(EmailAlreadyUsed)
+    }
+    "send UserFound if user in repository" in {
+      userService ! AuthUser(User("example@example.com", "pass"))
+      expectMsg(UserFound)
+    }
+    "send UserUnknown if user not in repository" in {
+      userService ! AuthUser(User("example2@example.com", "pass"))
+      expectMsg(UserUnknown)
     }
   }
 }

@@ -11,4 +11,6 @@ lazy val root = (project in file("."))
     libraryDependencies += scalaTest % Test
   )
 
-libraryDependencies ++= Seq(akkaHttp, akkaStream, akkaStreamTestKit, akkaHttpTestKit, akkaSpray)
+libraryDependencies ++= Seq(akkaHttp, akkaStream, akkaStreamTestKit, akkaHttpTestKit, akkaSpray,
+  "com.emarsys" %% "jwt-akka-http" % "1.1.4"
+)

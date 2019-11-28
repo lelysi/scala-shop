@@ -2,17 +2,21 @@ package lelysi.scalashop
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.{AuthorizationFailedRejection, Directive1, Route}
 import model.{ShopItem, User}
 import spray.json.{DefaultJsonProtocol, JsArray, JsNumber, JsString, JsValue, RootJsonFormat}
 import akka.http.scaladsl.server.Directives._
 import lelysi.scalashop.service.{UserService, WarehouseService}
 import akka.http.scaladsl.model.StatusCodes.BadRequest
+import akka.http.scaladsl.unmarshalling.Unmarshaller
 import akka.pattern.ask
 import akka.util.Timeout
-import lelysi.scalashop.service.UserService.{EmailAlreadyUsed, RegisterUser, UserRegistered, UserServiceResponse}
+import com.emarsys.jwt.akka.http.{JwtAuthentication, JwtConfig}
+import lelysi.scalashop.service.UserService.{AuthUser, EmailAlreadyUsed, RegisterUser, UserAuthenticationResponse, UserFound, UserRegistered, UserRegistrationResponse, UserServiceResponse, UserUnknown}
 import lelysi.scalashop.service.WarehouseService.{AddItem, ItemAdded, WarehouseServiceResponse}
 import spray.json._
+import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.Future
 
@@ -46,6 +50,18 @@ trait ShopRoute {
       }
     }
 
+  val login: Route =
+    path("login") {
+      post {
+        entity(as[User]) { user =>
+          onSuccess(authenticate(user)) {
+            case UserUnknown => reject(AuthorizationFailedRejection)
+            case UserFound => complete(StatusCodes.OK, JwtAuthenticationObj.generateToken(user.email))
+          }
+        }
+      }
+    }
+
   val addShopItem: Route =
     path("add-shop-item") {
       post {
@@ -63,8 +79,11 @@ trait ShopRoute {
   val userService: ActorRef
   val warehouseService: ActorRef
 
-  def registerUser(user: User): Future[UserServiceResponse] =
-    userService.ask(RegisterUser(user)).mapTo[UserServiceResponse]
+  def registerUser(user: User): Future[UserRegistrationResponse] =
+    userService.ask(RegisterUser(user)).mapTo[UserRegistrationResponse]
+
+  def authenticate(user: User): Future[UserAuthenticationResponse] =
+    userService.ask(AuthUser(user)).mapTo[UserAuthenticationResponse]
 
   def addItem(shopItem: ShopItem): Future[WarehouseServiceResponse] =
     warehouseService.ask(AddItem(shopItem)).mapTo[WarehouseServiceResponse]
@@ -74,4 +93,12 @@ class ShopApi(system: ActorSystem, timeout: Timeout) extends ShopRoute with Json
   implicit val requestTimeout: Timeout = timeout
   lazy val userService: ActorRef = system.actorOf(Props[UserService])
   lazy val warehouseService: ActorRef = system.actorOf(Props[WarehouseService])
+}
+
+object JwtAuthenticationObj extends JwtAuthentication {
+  case class Token(data: String)
+
+  override val jwtConfig: JwtConfig = new JwtConfig(ConfigFactory.load())
+
+  def auth(): Directive1[Token] = jwtAuthenticate(Unmarshaller.strict(x => Token(x)));
 }

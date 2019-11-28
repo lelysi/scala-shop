@@ -1,7 +1,7 @@
 import sbt._
 
 object Dependencies {
-  val akkaVersion = "2.5.23"
+  val akkaVersion = "2.5.25"
   val akkaHttpVersion = "10.1.10"
 
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.0.8"
@@ -10,4 +10,8 @@ object Dependencies {
   lazy val akkaStreamTestKit = "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion
   lazy val akkaHttpTestKit = "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion
   lazy val akkaSpray = "com.typesafe.akka" %%  "akka-http-spray-json" % akkaHttpVersion
+
+//  val sessionVersion = "0.5.10"
+//  lazy val sessionCore = "com.softwaremill.akka-http-session" %% "core" % sessionVersion
+//  lazy val sessionJwt = "com.softwaremill.akka-http-session" %% "jwt"  % sessionVersion
 }
