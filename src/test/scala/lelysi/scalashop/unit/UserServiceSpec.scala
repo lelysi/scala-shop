@@ -2,10 +2,11 @@ package lelysi.scalashop.unit
 
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestKit}
+import com.github.t3hnar.bcrypt._
 import lelysi.scalashop.StopSystemAfterAll
-import lelysi.scalashop.model.User
+import lelysi.scalashop.model.{Email, User, UserLogin}
 import lelysi.scalashop.service.UserService
-import lelysi.scalashop.service.UserService.{AuthUser, EmailAlreadyUsed, RegisterUser, UserFound, UserRegistered, UserUnknown}
+import lelysi.scalashop.service.UserService.{AuthUser, EmailAlreadyUsed, IncorrectPassword, RegisterUser, UserFound, UserRegistered, UserUnknown}
 import org.scalatest.WordSpecLike
 
 class UserServiceSpec extends TestKit(ActorSystem("test-spec"))
@@ -16,20 +17,24 @@ class UserServiceSpec extends TestKit(ActorSystem("test-spec"))
   "User Service" should {
     val userService = system.actorOf(Props[UserService])
     "send user registered message back" in {
-      userService ! RegisterUser(User("example@example.com", "pass"))
+      userService ! RegisterUser(User(Email("example@example.com"), "pass".bcryptSafe(generateSalt).get))
       expectMsg(UserRegistered)
     }
     "send already exists message on duplication" in {
-      userService ! RegisterUser(User("example@example.com", "pass"))
+      userService ! RegisterUser(User(Email("example@example.com"), "pass".bcryptSafe(generateSalt).get))
       expectMsg(EmailAlreadyUsed)
     }
-    "send UserFound if user in repository" in {
-      userService ! AuthUser(User("example@example.com", "pass"))
+    "send UserUnknown if user not in repository" in {
+      userService ! AuthUser(UserLogin(Email("example@example.com"), "pass"))
       expectMsg(UserFound)
     }
-    "send UserUnknown if user not in repository" in {
-      userService ! AuthUser(User("example2@example.com", "pass"))
+    "send UserFound if user in repository" in {
+      userService ! AuthUser(UserLogin(Email("example2@example.com"), "pass"))
       expectMsg(UserUnknown)
+    }
+    "send IncorrectPassword if pass is incorrect" in {
+      userService ! AuthUser(UserLogin(Email("example@example.com"), "pass2"))
+      expectMsg(IncorrectPassword)
     }
   }
 }

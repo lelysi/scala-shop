@@ -1,7 +1,10 @@
 package lelysi.scalashop.model
 
-case class User(email: String, password: String) {
+case class User(email: Email, hashedPassword: String)
 
+case class UserLogin(email: Email, password: String)
+
+case class Email(email: String) {
   def validateEmail(): Boolean = {
     // from https://emailregex.com/
     lazy val emailValidationRegEx =
@@ -10,5 +13,6 @@ case class User(email: String, password: String) {
   }
 
   require(validateEmail())
-}
 
+  override def toString: String = email
+}

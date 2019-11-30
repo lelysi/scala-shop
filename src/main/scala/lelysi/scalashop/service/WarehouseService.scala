@@ -1,6 +1,6 @@
 package lelysi.scalashop.service
 
-import akka.actor.{Actor, Props}
+import akka.actor.Actor
 import lelysi.scalashop.model.ShopItem
 import lelysi.scalashop.service.WarehouseService.{AddItem, ItemAdded}
 

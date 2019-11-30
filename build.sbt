@@ -12,5 +12,6 @@ lazy val root = (project in file("."))
   )
 
 libraryDependencies ++= Seq(akkaHttp, akkaStream, akkaStreamTestKit, akkaHttpTestKit, akkaSpray,
-  "com.emarsys" %% "jwt-akka-http" % "1.1.4"
+  "com.emarsys" %% "jwt-akka-http" % "1.1.4",
+  "com.github.t3hnar" %% "scala-bcrypt" % "4.1"
 )

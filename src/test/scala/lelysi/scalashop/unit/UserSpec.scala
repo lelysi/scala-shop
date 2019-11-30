@@ -1,6 +1,6 @@
 package lelysi.scalashop.unit
 
-import lelysi.scalashop.model.User
+import lelysi.scalashop.model.{Email, User}
 import org.scalatest._
 
 class UserSpec extends WordSpec {
@@ -8,12 +8,12 @@ class UserSpec extends WordSpec {
   "User" should {
     "throw an exception" in {
       intercept[IllegalArgumentException] {
-        User("thisIsIncorrectEmail", "lalala")
+        User(Email("thisIsIncorrectEmail"), "lalala")
       }
     }
 
     "be ok" in {
-      User("example@example.com", "lalala")
+      User(Email("example@example.com"), "lalala")
     }
   }
 }
