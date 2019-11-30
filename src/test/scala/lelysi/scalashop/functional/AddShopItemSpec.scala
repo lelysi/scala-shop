@@ -14,7 +14,7 @@ class AddShopItemSpec extends WordSpec
 
   val url: String = "/add-shop-item"
 
-  val route: Route = new ShopApi(system, Timeout(3.second)).addShopItem
+  val route: Route = new ShopApi(system, Timeout(3.second)).addShopItem()
 
   lazy val correctEntity = HttpEntity(
     ContentTypes.`application/json`,
