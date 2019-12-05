@@ -18,6 +18,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-http"   % akkaHttpVersion,
   "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion,
   "com.typesafe.akka" %%  "akka-http-spray-json" % akkaHttpVersion,
-  "com.emarsys" %% "jwt-akka-http" % "1.1.4",
-  "com.github.t3hnar" %% "scala-bcrypt" % "4.1"
+  "com.github.t3hnar" %% "scala-bcrypt" % "4.1",
+  "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test,
+  "com.pauldijou" %% "jwt-core" % "4.2.0"
 )

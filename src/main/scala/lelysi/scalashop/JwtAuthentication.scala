@@ -1,14 +1,14 @@
 package lelysi.scalashop
 
-import akka.http.scaladsl.server.Directive1
-import akka.http.scaladsl.unmarshalling.Unmarshaller
-import com.emarsys.jwt.akka.http.{JwtAuthentication, JwtConfig}
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
+import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
+import scala.util.Try
 
-object JwtAuthentication extends JwtAuthentication {
-  case class Token(data: String)
+object JwtAuthentication {
+  val config: Config = ConfigFactory.load()
+  val secret: String = config.getString("jwt.secret")
 
-  override val jwtConfig: JwtConfig = new JwtConfig(ConfigFactory.load())
+  def getToken(claim: String): String = Jwt.encode(claim, secret, JwtAlgorithm.HS256)
 
-  def auth(): Directive1[Token] = jwtAuthenticate(Unmarshaller.strict(x => Token(x)));
+  def getDecodedClaim(tokenString: String): Try[JwtClaim] = Jwt.decode(tokenString, secret, Seq(JwtAlgorithm.HS256))
 }

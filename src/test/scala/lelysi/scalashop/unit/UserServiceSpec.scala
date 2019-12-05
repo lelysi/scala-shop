@@ -16,17 +16,18 @@ class UserServiceSpec extends TestKit(ActorSystem("test-spec"))
 
   "User Service" should {
     val userService = system.actorOf(Props[UserService])
+    val user = User(Email("example@example.com"), "pass".bcryptSafe(generateSalt).get)
     "send user registered message back" in {
-      userService ! RegisterUser(User(Email("example@example.com"), "pass".bcryptSafe(generateSalt).get))
+      userService ! RegisterUser(user)
       expectMsg(UserRegistered)
     }
     "send already exists message on duplication" in {
-      userService ! RegisterUser(User(Email("example@example.com"), "pass".bcryptSafe(generateSalt).get))
+      userService ! RegisterUser(user)
       expectMsg(EmailAlreadyUsed)
     }
     "send UserUnknown if user not in repository" in {
       userService ! AuthUser(UserLogin(Email("example@example.com"), "pass"))
-      expectMsg(UserFound)
+      expectMsg(UserFound(user))
     }
     "send UserFound if user in repository" in {
       userService ! AuthUser(UserLogin(Email("example2@example.com"), "pass"))
