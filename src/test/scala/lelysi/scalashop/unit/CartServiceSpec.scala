@@ -4,8 +4,8 @@ import java.util.UUID
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import lelysi.scalashop.StopSystemAfterAll
-import lelysi.scalashop.model.{Email, ItemToCart, ShopItem}
-import lelysi.scalashop.service.CartService.{ItemAddedToCart, ItemWasNotFound}
+import lelysi.scalashop.model.{Email, ShopItem}
+import lelysi.scalashop.service.CartService.{ItemAddedToCart, ItemToCart, ItemWasNotFound}
 import lelysi.scalashop.service.CartService
 import lelysi.scalashop.service.WarehouseService.{GetItem, ItemFound}
 import org.scalatest.WordSpecLike

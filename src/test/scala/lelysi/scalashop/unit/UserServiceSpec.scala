@@ -4,7 +4,7 @@ import akka.actor.{ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestKit}
 import com.github.t3hnar.bcrypt._
 import lelysi.scalashop.StopSystemAfterAll
-import lelysi.scalashop.model.{Email, User, UserLogin}
+import lelysi.scalashop.model.{Email, PaymentAccount, User, UserLogin}
 import lelysi.scalashop.service.UserService
 import lelysi.scalashop.service.UserService.{AuthUser, EmailAlreadyUsed, IncorrectPassword, RegisterUser, UserFound, UserRegistered, UserUnknown}
 import org.scalatest.WordSpecLike
@@ -16,7 +16,7 @@ class UserServiceSpec extends TestKit(ActorSystem("test-spec"))
 
   "User Service" should {
     val userService = system.actorOf(Props[UserService])
-    val user = User(Email("example@example.com"), "pass".bcryptSafe(generateSalt).get)
+    val user = User(Email("example@example.com"), "pass".bcryptSafe(generateSalt).get, PaymentAccount("abcde"))
     "send user registered message back" in {
       userService ! RegisterUser(user)
       expectMsg(UserRegistered)

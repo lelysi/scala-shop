@@ -10,7 +10,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 trait RequestTimeout {
   import scala.concurrent.duration._
-  def requestTimeout(config: Config): Timeout = {
+  def requestTimeout(implicit config: Config): Timeout = {
     val t = config.getString("requestTimeout")
     val d = Duration(t)
     FiniteDuration(d.length, d.unit)
@@ -19,7 +19,7 @@ trait RequestTimeout {
 
 object ScalaShopMain extends App with RequestTimeout {
 
-  val config = ConfigFactory.load()
+  implicit val config: Config = ConfigFactory.load()
   val host = config.getString("http.host")
   val port = config.getInt("http.port")
 
@@ -27,7 +27,7 @@ object ScalaShopMain extends App with RequestTimeout {
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val log: LoggingAdapter = Logging(system, "main")
 
-  val api = new ShopApi(system, requestTimeout(config))
+  val api = new ShopApi(system, requestTimeout)
 
   val bindingFuture = Http().bindAndHandle(Route.handlerFlow(api.routes), host, port)
 

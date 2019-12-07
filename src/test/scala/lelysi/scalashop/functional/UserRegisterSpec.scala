@@ -4,8 +4,10 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.util.Timeout
+import com.typesafe.config.{Config, ConfigFactory}
 import lelysi.scalashop.ShopApi
 import org.scalatest._
+
 import scala.concurrent.duration._
 
 class UserRegisterSpec extends WordSpec
@@ -13,12 +15,12 @@ class UserRegisterSpec extends WordSpec
   with ScalatestRouteTest {
 
   val url: String = "/registration"
-
-  val route: Route = new ShopApi(system, Timeout(3.second)).userRegistration
+  implicit val config: Config = ConfigFactory.load()
+  val route: Route = new ShopApi(system, Timeout(3.second)).userRegistration()
 
   lazy val correctEntity = HttpEntity(
     ContentTypes.`application/json`,
-    """{ "email": "example@example.com", "password" : "pass" }"""
+    """{ "email": "example@example.com", "password" : "pass", "account" : "any" }"""
   )
 
   lazy val incorrectEntity = HttpEntity(
@@ -28,14 +30,13 @@ class UserRegisterSpec extends WordSpec
 
   lazy val incorrectEmailEntity = HttpEntity(
     ContentTypes.`application/json`,
-    """{ "email": "@example.com", "password" : "pass" }"""
+    """{ "email": "@example.com", "password" : "pass", "accouunt" : "any" }"""
   )
 
   "User Register Service" should {
     "return 200 for correct register data" in {
       Post(url, correctEntity) ~> route ~> check {
         status shouldEqual StatusCodes.OK
-        responseAs[String] shouldEqual "New user with email example@example.com was registered"
       }
     }
 

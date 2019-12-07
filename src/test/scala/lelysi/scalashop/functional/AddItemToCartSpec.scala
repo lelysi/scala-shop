@@ -1,6 +1,7 @@
 package lelysi.scalashop.functional
 
 import java.util.UUID
+
 import akka.actor.ActorRef
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
@@ -8,10 +9,12 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.testkit.TestProbe
 import lelysi.scalashop.ShopApi
-import lelysi.scalashop.model.{Email, ItemToCart}
-import lelysi.scalashop.service.CartService.{ItemAddedToCart, ItemWasNotFound}
+import lelysi.scalashop.model.Email
+import lelysi.scalashop.service.CartService.{ItemAddedToCart, ItemToCart, ItemWasNotFound}
 import org.scalatest._
 import akka.util.Timeout
+import com.typesafe.config.{Config, ConfigFactory}
+
 import scala.concurrent.duration._
 
 class AddItemToCartSpec extends WordSpec
@@ -19,6 +22,7 @@ class AddItemToCartSpec extends WordSpec
   with ScalatestRouteTest {
 
   lazy val timeout: Timeout = Timeout(3.seconds)
+  implicit val config: Config = ConfigFactory.load()
 
   val url: String = "/add-item-to-cart"
 
@@ -37,15 +41,15 @@ class AddItemToCartSpec extends WordSpec
     "return 201 for correct data" in {
       Post("/registration", HttpEntity(
         ContentTypes.`application/json`,
-        """{ "email": "example@example.com", "password" : "1234" }"""
-      )) ~> Route.seal(MockApi.userRegistration) ~> check {
+        """{ "email": "example@example.com", "password" : "1234", "account" : "any" }"""
+      )) ~> Route.seal(MockApi.userRegistration()) ~> check {
         status shouldEqual StatusCodes.OK
       }
 
       val jwtKey = Post("/login", HttpEntity(
         ContentTypes.`application/json`,
         """{ "email": "example@example.com", "password" : "1234" }"""
-      )) ~> Route.seal(MockApi.login) ~> check {
+      )) ~> Route.seal(MockApi.login()) ~> check {
         response.entity.toStrict(timeout.duration).map(_.data.decodeString("UTF-8"))
       }
 
@@ -76,8 +80,8 @@ class AddItemToCartSpec extends WordSpec
     "return 400 for incorrect item data" in {
       val jwtKey = Post("/login", HttpEntity(
         ContentTypes.`application/json`,
-        """{ "email": "example@example.com", "password" : "1234" }"""
-      )) ~> Route.seal(MockApi.login) ~> check {
+        """{ "email": "example@example.com", "password" : "1234", "account" : "any" }"""
+      )) ~> Route.seal(MockApi.login()) ~> check {
         response.entity.toStrict(timeout.duration).map(_.data.decodeString("UTF-8"))
       }
 

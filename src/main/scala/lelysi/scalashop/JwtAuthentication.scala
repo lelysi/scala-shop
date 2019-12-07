@@ -1,11 +1,10 @@
 package lelysi.scalashop
 
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.Config
 import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
 import scala.util.Try
 
-object JwtAuthentication {
-  val config: Config = ConfigFactory.load()
+class JwtAuthentication(config: Config) {
   val secret: String = config.getString("jwt.secret")
 
   def getToken(claim: String): String = Jwt.encode(claim, secret, JwtAlgorithm.HS256)

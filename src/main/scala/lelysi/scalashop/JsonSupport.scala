@@ -1,9 +1,8 @@
 package lelysi.scalashop
 
 import java.util.UUID
-
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import lelysi.scalashop.model.{Email, ItemToCart, ItemUuid, ShopItem, User, UserLogin}
+import lelysi.scalashop.model.{Email, ItemUuid, PaymentAccount, ShopItem, User, UserLogin}
 import spray.json.{DefaultJsonProtocol, DeserializationException, JsArray, JsNumber, JsString, JsValue, RootJsonFormat}
 import com.github.t3hnar.bcrypt._
 
@@ -17,10 +16,10 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   }
 
   implicit val userFormat: RootJsonFormat[User] = new RootJsonFormat[User] {
-    override def read(json: JsValue): User = json.asJsObject().getFields("email", "password") match {
-      case Seq(JsString(email), JsString(password)) =>
+    override def read(json: JsValue): User = json.asJsObject().getFields("email", "password", "account") match {
+      case Seq(JsString(email), JsString(password), JsString(account)) =>
         val hash = password.bcryptSafe(generateSalt).get
-        User(Email(email), hash)
+        User(Email(email), hash, PaymentAccount(account))
       case _ => throw DeserializationException("User data invalid" + json)
     }
     override def write(obj: User): JsValue = JsArray(JsString(obj.email.toString))

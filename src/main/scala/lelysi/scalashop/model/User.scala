@@ -1,6 +1,6 @@
 package lelysi.scalashop.model
 
-case class User(email: Email, hashedPassword: String)
+case class User(email: Email, hashedPassword: String, paymentAccount: PaymentAccount)
 
 case class UserLogin(email: Email, password: String)
 
@@ -16,3 +16,5 @@ case class Email(email: String) {
 
   override def toString: String = email
 }
+
+case class PaymentAccount(accountNumber: String)

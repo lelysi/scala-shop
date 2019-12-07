@@ -17,8 +17,8 @@ object UserService {
   case object UserRegistered extends UserRegistrationResponse
   case object EmailAlreadyUsed extends UserRegistrationResponse
 
-  sealed trait UserAuthenticationResponse
-  sealed trait UserSearchResponse
+  sealed trait UserAuthenticationResponse extends UserServiceResponse
+  sealed trait UserSearchResponse extends UserServiceResponse
   case class UserFound(user: User) extends UserAuthenticationResponse with UserSearchResponse
   case object UserUnknown extends UserAuthenticationResponse with UserSearchResponse
   case object IncorrectPassword extends UserAuthenticationResponse
@@ -28,7 +28,7 @@ class UserService extends Actor {
   private val userRepository: mutable.Set[User] = mutable.Set()
 
   def findElemByEmail(e: Email): Option[User] = {
-    userRepository.find(x => x.email.email == e.email)
+    userRepository.find(x => x.email == e)
   }
 
   override def receive: Receive = {
@@ -37,7 +37,7 @@ class UserService extends Actor {
         case None =>
           userRepository.add(user)
           sender() ! UserRegistered
-        case _ =>
+        case Some(_) =>
           sender() ! EmailAlreadyUsed
       }
 
