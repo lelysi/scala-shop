@@ -20,6 +20,7 @@ trait RequestTimeout {
 object ScalaShopMain extends App with RequestTimeout {
 
   implicit val config: Config = ConfigFactory.load()
+  implicit val timeout: Timeout = requestTimeout
   val host = config.getString("http.host")
   val port = config.getInt("http.port")
 
@@ -27,7 +28,7 @@ object ScalaShopMain extends App with RequestTimeout {
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val log: LoggingAdapter = Logging(system, "main")
 
-  val api = new ShopApi(system, requestTimeout)
+  val api = new ShopApi(system)
 
   val bindingFuture = Http().bindAndHandle(Route.handlerFlow(api.routes), host, port)
 

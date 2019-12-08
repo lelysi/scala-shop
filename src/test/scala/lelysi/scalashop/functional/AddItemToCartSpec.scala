@@ -1,35 +1,22 @@
 package lelysi.scalashop.functional
 
 import java.util.UUID
-
 import akka.actor.ActorRef
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.testkit.TestProbe
-import lelysi.scalashop.ShopApi
+import lelysi.scalashop.{FunctionalTestSpec, ShopApi}
 import lelysi.scalashop.model.Email
 import lelysi.scalashop.service.CartService.{ItemAddedToCart, ItemToCart, ItemWasNotFound}
-import org.scalatest._
-import akka.util.Timeout
-import com.typesafe.config.{Config, ConfigFactory}
 
-import scala.concurrent.duration._
+final class AddItemToCartSpec extends FunctionalTestSpec {
 
-class AddItemToCartSpec extends WordSpec
-  with Matchers
-  with ScalatestRouteTest {
+  lazy val url: String = "/add-item-to-cart"
+  lazy val cartServiceMock = TestProbe();
 
-  lazy val timeout: Timeout = Timeout(3.seconds)
-  implicit val config: Config = ConfigFactory.load()
-
-  val url: String = "/add-item-to-cart"
-
-  val probe = TestProbe();
-
-  object MockApi extends ShopApi(system, timeout) {
-    override lazy val cartService: ActorRef = probe.ref
+  object MockApi extends ShopApi(system) {
+    override lazy val cartService: ActorRef = cartServiceMock.ref
   }
 
   lazy val entity = HttpEntity(
@@ -58,8 +45,11 @@ class AddItemToCartSpec extends WordSpec
         addHeader(RawHeader("X-Api-Key", jwtKey.value.get.get)) ~>
         Route.seal(MockApi.addItemToCartRoute())
 
-      probe.expectMsg(ItemToCart(Email("example@example.com"), UUID.fromString("b1c8b8fb-3ef7-49ab-907d-dcc4996eac8f")))
-      probe.reply(ItemAddedToCart)
+      serviceMsgMap(
+        cartServiceMock,
+        ItemToCart(Email("example@example.com"), UUID.fromString("b1c8b8fb-3ef7-49ab-907d-dcc4996eac8f")),
+        ItemAddedToCart
+      )
 
       result ~> check {
         status shouldEqual StatusCodes.OK
@@ -90,14 +80,16 @@ class AddItemToCartSpec extends WordSpec
           addHeader(RawHeader("X-Api-Key", jwtKey.value.get.get)) ~>
           Route.seal(MockApi.addItemToCartRoute())
 
-      probe.expectMsg(ItemToCart(Email("example@example.com"), UUID.fromString("b1c8b8fb-3ef7-49ab-907d-dcc4996eac8f")))
-      probe.reply(ItemWasNotFound)
+      serviceMsgMap(
+        cartServiceMock,
+        ItemToCart(Email("example@example.com"), UUID.fromString("b1c8b8fb-3ef7-49ab-907d-dcc4996eac8f")),
+        ItemWasNotFound
+      )
 
       result ~> check {
         status shouldEqual StatusCodes.BadRequest
         responseAs[String] shouldEqual s"item was not found"
       }
     }
-
   }
 }

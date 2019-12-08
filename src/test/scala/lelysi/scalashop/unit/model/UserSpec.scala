@@ -1,9 +1,9 @@
-package lelysi.scalashop.unit
+package lelysi.scalashop.unit.model
 
 import lelysi.scalashop.model.{Email, PaymentAccount, User}
 import org.scalatest._
 
-class UserSpec extends WordSpec {
+final class UserSpec extends WordSpec {
 
   "User" should {
     "throw an exception" in {

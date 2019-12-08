@@ -1,7 +1,6 @@
 package lelysi.scalashop.service
 
 import java.util.UUID
-
 import akka.actor.{Actor, ActorRef, Props}
 import akka.event.{Logging, LoggingAdapter}
 import lelysi.scalashop.model.{Email, ShopItem}
@@ -13,7 +12,6 @@ import scala.collection.mutable
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.Success
 import akka.util.Timeout
-
 import scala.concurrent.duration._
 
 object CartService {

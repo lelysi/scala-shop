@@ -1,38 +1,29 @@
-package lelysi.scalashop.unit
+package lelysi.scalashop.unit.service
 
-import java.util.UUID
-import akka.actor.{ActorSystem, Props}
-import akka.testkit.{ImplicitSender, TestKit}
-import lelysi.scalashop.StopSystemAfterAll
+import akka.actor.{ActorRef, Props}
 import lelysi.scalashop.model.ShopItem
 import lelysi.scalashop.service.WarehouseService
-import lelysi.scalashop.service.WarehouseService.{AddItem, CheckItemList, GetItem, ItemAdded, ItemFound, ItemNotFound, ItemsAvailable, ItemsNotAvailable}
-import org.scalatest.WordSpecLike
+import lelysi.scalashop.service.WarehouseService._
+import lelysi.scalashop.unit.UnitServiceSpec
 
-class WarehouseServiceSpec extends TestKit(ActorSystem("test-spec"))
-  with WordSpecLike
-  with ImplicitSender
-  with StopSystemAfterAll {
+final class WarehouseServiceSpec extends UnitServiceSpec {
 
-  val storedItemUuid: UUID = UUID.fromString("b0780116-f213-4066-afb6-faaf24b399bb")
-  val notStoredItemUuid: UUID = UUID.fromString("01234567-89ab-cdef-0123-456789abcdef")
-  val storedItem = ShopItem(storedItemUuid, 4.12, "special offer")
-  val notStoredItem = ShopItem(notStoredItemUuid, 100.00, "poker deck")
+  lazy val notStoredItem = ShopItem(notStoredInWarehouseItemUuid, 100.00, "poker deck")
+  lazy val warehouseService: ActorRef = system.actorOf(Props[WarehouseService])
 
   "Warehouse Service" should {
-    val warehouseService = system.actorOf(Props[WarehouseService])
     "send ItemAdded message on AddItem" in {
       warehouseService ! AddItem(storedItem)
       expectMsg(ItemAdded)
     }
 
     "send ItemFound on GetItem with correct item" in {
-      warehouseService ! GetItem(storedItemUuid)
+      warehouseService ! GetItem(storedInWarehouseItemUuid)
       expectMsg(ItemFound(storedItem))
     }
 
     "send ItemNotFound on GetItem with correct item" in {
-      warehouseService ! GetItem(notStoredItemUuid)
+      warehouseService ! GetItem(notStoredInWarehouseItemUuid)
       expectMsg(ItemNotFound)
     }
 
@@ -52,6 +43,12 @@ class WarehouseServiceSpec extends TestKit(ActorSystem("test-spec"))
 
     "send ItemsNotAvailable on CheckItemList with incorrect items" in {
       warehouseService ! CheckItemList(List(notStoredItem))
+      expectMsg(ItemsNotAvailable)
+    }
+
+    "has no such items after removing" in {
+      warehouseService ! RemoveItemList(List(storedItem, storedItem))
+      warehouseService ! CheckItemList(List(storedItem))
       expectMsg(ItemsNotAvailable)
     }
   }

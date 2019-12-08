@@ -2,21 +2,12 @@ package lelysi.scalashop.functional
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.testkit.ScalatestRouteTest
-import akka.util.Timeout
-import com.typesafe.config.{Config, ConfigFactory}
-import lelysi.scalashop.ShopApi
-import org.scalatest._
+import lelysi.scalashop.{FunctionalTestSpec, ShopApi}
 
-import scala.concurrent.duration._
+final class UserRegisterSpec extends FunctionalTestSpec {
 
-class UserRegisterSpec extends WordSpec
-  with Matchers
-  with ScalatestRouteTest {
-
-  val url: String = "/registration"
-  implicit val config: Config = ConfigFactory.load()
-  val route: Route = new ShopApi(system, Timeout(3.second)).userRegistration()
+  lazy val url: String = "/registration"
+  lazy val route: Route = new ShopApi(system).userRegistration()
 
   lazy val correctEntity = HttpEntity(
     ContentTypes.`application/json`,
@@ -30,7 +21,7 @@ class UserRegisterSpec extends WordSpec
 
   lazy val incorrectEmailEntity = HttpEntity(
     ContentTypes.`application/json`,
-    """{ "email": "@example.com", "password" : "pass", "accouunt" : "any" }"""
+    """{ "email": "@example.com", "password" : "pass", "account" : "any" }"""
   )
 
   "User Register Service" should {

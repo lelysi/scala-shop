@@ -14,14 +14,13 @@ import lelysi.scalashop.service.CheckoutService.{CheckoutFail, CheckoutServiceRe
 import lelysi.scalashop.service.UserService.{AuthUser, EmailAlreadyUsed, IncorrectPassword, RegisterUser, UserAuthenticationResponse, UserFound, UserRegistered, UserRegistrationResponse, UserSearchResponse, UserUnknown}
 import lelysi.scalashop.service.WarehouseService.{AddItem, ItemAdded, WarehouseServiceAddItemResponse}
 import lelysi.scalashop.service.paymentgate.{FakePaymentGate, Order}
-
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 trait ShopRoute {
   this: JsonSupport =>
 
-  implicit def requestTimeout: Timeout
+  implicit val timeout: Timeout
 
   def userRegistration(): Route =
     path("registration") {
@@ -118,8 +117,9 @@ trait ShopRoute {
     checkoutService.ask(Email).mapTo[CheckoutServiceResponse]
 }
 
-class ShopApi(system: ActorSystem, timeout: Timeout)(implicit config: Config) extends ShopRoute with JsonSupport {
-  implicit val requestTimeout: Timeout = timeout
+class ShopApi(system: ActorSystem)(implicit val timeout: Timeout, implicit val config: Config) extends ShopRoute
+  with JsonSupport {
+
   lazy val userService: ActorRef = system.actorOf(Props[UserService])
   lazy val warehouseService: ActorRef = system.actorOf(Props[WarehouseService])
   lazy val cartService: ActorRef = system.actorOf(CartService.props(warehouseService))

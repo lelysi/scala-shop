@@ -2,21 +2,12 @@ package lelysi.scalashop.functional
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.testkit.ScalatestRouteTest
-import akka.util.Timeout
-import com.typesafe.config.{Config, ConfigFactory}
-import lelysi.scalashop.ShopApi
-import org.scalatest._
+import lelysi.scalashop.{FunctionalTestSpec, ShopApi}
 
-import scala.concurrent.duration._
+final class UserLoginSpec extends FunctionalTestSpec {
 
-class UserLoginSpec extends WordSpec
-  with Matchers
-  with ScalatestRouteTest {
-
-  val url: String = "/login"
-  implicit val config: Config = ConfigFactory.load()
-  val route = new ShopApi(system, Timeout(3.second))
+  lazy val url: String = "/login"
+  lazy val route = new ShopApi(system)
 
   lazy val correctEntity = HttpEntity(
     ContentTypes.`application/json`,
