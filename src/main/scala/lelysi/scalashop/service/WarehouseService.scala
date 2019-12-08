@@ -3,15 +3,16 @@ package lelysi.scalashop.service
 import java.util.UUID
 import akka.actor.Actor
 import akka.event.{Logging, LoggingAdapter}
-import lelysi.scalashop.model.ShopItem
+import lelysi.scalashop.model.{AddItemToWarehouse, ShopItem}
 import lelysi.scalashop.service.WarehouseService.{AddItem, CheckItemList, GetItem, ItemAdded, ItemFound, ItemNotFound, ItemsAvailable, ItemsNotAvailable, RemoveItemList}
 import scala.collection.mutable
 
 object WarehouseService {
-  case class AddItem(shopItem: ShopItem)
+  case class AddItem(itemToWarehouse: AddItemToWarehouse)
   case class GetItem(uuid: UUID, count: Int)
   case class CheckItemList(items: List[ShopItem])
   case class RemoveItemList(items: List[ShopItem])
+  case object GetAll
 
   sealed trait WarehouseServiceResponse
 
@@ -32,10 +33,12 @@ class WarehouseService extends Actor {
   private val shopItemRepository: mutable.Map[UUID, (ShopItem, Int)] = mutable.Map()
 
   override def receive: Receive = {
-    case AddItem(shopItem) =>
-      shopItemRepository.get(shopItem.uuid) match {
-        case Some((savedItem, count)) => shopItemRepository.update(shopItem.uuid, (savedItem, count + 1))
-        case None => shopItemRepository(shopItem.uuid) = (shopItem, 1)
+    case AddItem(itemToWarehouse) =>
+      shopItemRepository.get(itemToWarehouse.shopItem.uuid) match {
+        case Some((savedItem, count)) =>
+          shopItemRepository.update(itemToWarehouse.shopItem.uuid, (savedItem, count + itemToWarehouse.count))
+        case None =>
+          shopItemRepository(itemToWarehouse.shopItem.uuid) = (itemToWarehouse.shopItem, itemToWarehouse.count)
       }
       sender() ! ItemAdded
 

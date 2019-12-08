@@ -1,8 +1,9 @@
 package lelysi.scalashop
 
 import java.util.UUID
+
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import lelysi.scalashop.model.{Email, ItemUuid, PaymentAccount, ShopItem, User, UserLogin}
+import lelysi.scalashop.model.{AddItemToWarehouse, Email, ItemUuid, PaymentAccount, ShopItem, User, UserLogin}
 import spray.json.{DefaultJsonProtocol, DeserializationException, JsArray, JsNumber, JsString, JsValue, RootJsonFormat}
 import com.github.t3hnar.bcrypt._
 
@@ -25,12 +26,14 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
     override def write(obj: User): JsValue = JsArray(JsString(obj.email.toString))
   }
 
-  implicit val shopItemFormat: RootJsonFormat[ShopItem] = new RootJsonFormat[ShopItem] {
-    override def read(json: JsValue): ShopItem = json.asJsObject().getFields("price", "description") match {
-      case Seq(JsNumber(price), JsString(description)) => new ShopItem(price.toDouble, description.toString)
+  implicit val shopItemFormat: RootJsonFormat[AddItemToWarehouse] = new RootJsonFormat[AddItemToWarehouse] {
+    override def read(json: JsValue): AddItemToWarehouse = json.asJsObject().getFields("price", "description", "count") match {
+      case Seq(JsNumber(price), JsString(description), JsNumber(count)) =>
+        AddItemToWarehouse(new ShopItem(price.toDouble, description.toString), count.toInt)
       case _ => throw DeserializationException("ShopItem expected" + json)
     }
-    override def write(obj: ShopItem): JsValue = JsArray(JsNumber(obj.price), JsString(obj.description))
+    override def write(obj: AddItemToWarehouse): JsValue =
+      JsArray(JsString(obj.shopItem.uuid.toString), JsNumber(obj.shopItem.price), JsString(obj.shopItem.description))
   }
 
   implicit val itemUuidFormat: RootJsonFormat[ItemUuid] = new RootJsonFormat[ItemUuid] {

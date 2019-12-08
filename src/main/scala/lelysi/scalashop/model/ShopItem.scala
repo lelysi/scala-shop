@@ -6,3 +6,5 @@ case class ShopItem(uuid: UUID, price: Double, description: String) {
   def this(price: Double, description: String) = this(UUID.randomUUID(), price, description)
   assert(price > 0)
 }
+
+case class AddItemToWarehouse(shopItem: ShopItem, count: Int)

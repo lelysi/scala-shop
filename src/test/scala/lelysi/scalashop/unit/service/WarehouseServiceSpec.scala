@@ -1,7 +1,7 @@
 package lelysi.scalashop.unit.service
 
 import akka.actor.{ActorRef, Props}
-import lelysi.scalashop.model.ShopItem
+import lelysi.scalashop.model.{AddItemToWarehouse, ShopItem}
 import lelysi.scalashop.service.WarehouseService
 import lelysi.scalashop.service.WarehouseService._
 import lelysi.scalashop.unit.UnitServiceSpec
@@ -10,10 +10,11 @@ final class WarehouseServiceSpec extends UnitServiceSpec {
 
   lazy val notStoredItem = ShopItem(notStoredInWarehouseItemUuid, 100.00, "poker deck")
   lazy val warehouseService: ActorRef = system.actorOf(Props[WarehouseService])
+  lazy val itemToWarehouse = AddItemToWarehouse(storedItem, 1)
 
   "Warehouse Service" should {
     "send ItemAdded message on AddItem" in {
-      warehouseService ! AddItem(storedItem)
+      warehouseService ! AddItem(itemToWarehouse)
       expectMsg(ItemAdded)
     }
 
@@ -34,7 +35,7 @@ final class WarehouseServiceSpec extends UnitServiceSpec {
 
     "send ItemsAvailable on CheckItemList with correct items amount" in {
       // add another one item to storage
-      warehouseService ! AddItem(storedItem)
+      warehouseService ! AddItem(itemToWarehouse)
       expectMsg(ItemAdded)
 
       warehouseService ! CheckItemList(List(storedItem))

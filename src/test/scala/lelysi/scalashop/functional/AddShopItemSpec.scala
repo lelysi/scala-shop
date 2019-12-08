@@ -11,7 +11,7 @@ final class AddShopItemSpec extends FunctionalTestSpec {
 
   lazy val correctEntity = HttpEntity(
     ContentTypes.`application/json`,
-    """{ "price": 4.12, "description" : "special offer" }"""
+    """{ "price": 4.12, "description" : "special offer", "count": 700000 }"""
   )
 
   lazy val incorrectEntity = HttpEntity(
