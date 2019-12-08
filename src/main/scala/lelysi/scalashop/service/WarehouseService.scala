@@ -9,7 +9,7 @@ import scala.collection.mutable
 
 object WarehouseService {
   case class AddItem(shopItem: ShopItem)
-  case class GetItem(uuid: UUID)
+  case class GetItem(uuid: UUID, count: Int)
   case class CheckItemList(items: List[ShopItem])
   case class RemoveItemList(items: List[ShopItem])
 
@@ -39,10 +39,10 @@ class WarehouseService extends Actor {
       }
       sender() ! ItemAdded
 
-    case GetItem(uuid) =>
+    case GetItem(uuid, countToAdd) =>
       shopItemRepository.get(uuid) match {
         case Some((savedItem, count)) =>
-          if (count > 0) {
+          if (count >= countToAdd) {
             sender() ! ItemFound(savedItem)
           }
           else {

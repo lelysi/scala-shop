@@ -18,12 +18,17 @@ final class WarehouseServiceSpec extends UnitServiceSpec {
     }
 
     "send ItemFound on GetItem with correct item" in {
-      warehouseService ! GetItem(storedInWarehouseItemUuid)
+      warehouseService ! GetItem(storedInWarehouseItemUuid, 1)
       expectMsg(ItemFound(storedItem))
     }
 
+    "send ItemFound on GetItem with correct item and incorrect numbers" in {
+      warehouseService ! GetItem(storedInWarehouseItemUuid, 2)
+      expectMsg(ItemNotFound)
+    }
+
     "send ItemNotFound on GetItem with correct item" in {
-      warehouseService ! GetItem(notStoredInWarehouseItemUuid)
+      warehouseService ! GetItem(notStoredInWarehouseItemUuid, 1)
       expectMsg(ItemNotFound)
     }
 

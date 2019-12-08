@@ -40,7 +40,11 @@ class CartService(warehouseService: ActorRef) extends Actor with RequestTimeout 
   override def receive: Receive = {
     case ItemToCart(userEmail, uuid) =>
       val senderActor = sender()
-      warehouseService.ask(GetItem(uuid)) onComplete {
+      val alreadyAddedItems = cartRepository.get(userEmail) match {
+        case Some(items) => items.count(item => item.uuid == uuid)
+        case None => 0
+      }
+      warehouseService.ask(GetItem(uuid, alreadyAddedItems + 1)) onComplete {
         case Success(optionResult: WarehouseServiceGetItemResponse) => optionResult match {
           case ItemFound(shopItem) =>
             cartRepository.get(userEmail) match {

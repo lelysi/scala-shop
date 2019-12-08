@@ -16,13 +16,13 @@ final class CartServiceSpec extends UnitServiceSpec {
   "Cart Service" should {
     "response ItemAdded on existing item" in {
       cartService ! correctItemToCart
-      serviceMsgMap(warehouseServiceMock, GetItem(storedInWarehouseItemUuid), ItemFound(storedItem))
+      serviceMsgMap(warehouseServiceMock, GetItem(storedInWarehouseItemUuid, 1), ItemFound(storedItem))
       expectMsg(ItemAddedToCart)
     }
 
     "response ItemWasNotFound on not existing item" in {
       cartService ! incorrectItemToCart
-      serviceMsgMap(warehouseServiceMock, GetItem(notStoredInWarehouseItemUuid), ItemWasNotFound)
+      serviceMsgMap(warehouseServiceMock, GetItem(notStoredInWarehouseItemUuid, 1), ItemWasNotFound)
       expectMsg(ItemWasNotFound)
     }
 
