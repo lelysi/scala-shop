@@ -30,7 +30,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
     override def read(json: JsValue): AddItemToWarehouse = json.asJsObject().getFields("price", "description", "count") match {
       case Seq(JsNumber(price), JsString(description), JsNumber(count)) =>
         AddItemToWarehouse(new ShopItem(price.toDouble, description.toString), count.toInt)
-      case _ => throw DeserializationException("ShopItem expected" + json)
+      case _ => throw DeserializationException("AddItemToWarehouse expected " + json)
     }
     override def write(obj: AddItemToWarehouse): JsValue =
       JsArray(JsString(obj.shopItem.uuid.toString), JsNumber(obj.shopItem.price), JsString(obj.shopItem.description))

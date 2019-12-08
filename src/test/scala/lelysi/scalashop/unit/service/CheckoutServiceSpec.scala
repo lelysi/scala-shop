@@ -5,7 +5,7 @@ import akka.testkit.TestProbe
 import lelysi.scalashop.model.{Email, PaymentAccount, ShopItem, User}
 import lelysi.scalashop.service.CartService.{Cart, CartNotFound, EmptyCart, GetCart}
 import lelysi.scalashop.service.CheckoutService
-import lelysi.scalashop.service.CheckoutService.{CheckoutFail, CheckoutSuccess}
+import lelysi.scalashop.service.CheckoutService.{CheckoutFail, CheckoutRequest, CheckoutSuccess}
 import lelysi.scalashop.service.UserService.{FindUser, UserFound, UserUnknown}
 import lelysi.scalashop.service.WarehouseService.{CheckItemList, ItemsAvailable, ItemsNotAvailable, RemoveItemList}
 import lelysi.scalashop.service.paymentgate.{FakePaymentGate, Order}
@@ -23,10 +23,11 @@ final class CheckoutServiceSpec extends UnitServiceSpec {
   lazy val checkoutService: ActorRef = system.actorOf(CheckoutService.props(
     userService.ref, cartService.ref, warehouseServiceMock.ref, system.actorOf(Props[FakePaymentGate])
   ))
+  lazy val checkoutRequest = CheckoutRequest(correctEmail)
 
   "Checkout Service with Fake Payment Gate" should {
     "response on correct msg" in {
-      checkoutService ! correctEmail
+      checkoutService ! checkoutRequest
       serviceMsgMap(userService, FindUser(correctEmail), UserFound(existingUser))
       serviceMsgMap(cartService, GetCart(correctEmail), Cart(listOfItems))
       serviceMsgMap(warehouseServiceMock, CheckItemList(listOfItems), ItemsAvailable)
@@ -39,7 +40,7 @@ final class CheckoutServiceSpec extends UnitServiceSpec {
     }
 
     "response on unknown user" in {
-      checkoutService ! correctEmail
+      checkoutService ! checkoutRequest
       serviceMsgMap(userService, FindUser(correctEmail), UserUnknown)
       serviceMsgMap(cartService, GetCart(correctEmail), Cart(listOfItems))
       serviceMsgMap(warehouseServiceMock, CheckItemList(listOfItems), ItemsAvailable)
@@ -47,14 +48,14 @@ final class CheckoutServiceSpec extends UnitServiceSpec {
     }
 
     "response on empty cart" in {
-      checkoutService ! correctEmail
+      checkoutService ! checkoutRequest
       serviceMsgMap(userService, FindUser(correctEmail), UserFound(existingUser))
       serviceMsgMap(cartService, GetCart(correctEmail), CartNotFound)
       expectMsg(CheckoutFail)
     }
 
     "response on empty warehouse" in {
-      checkoutService ! correctEmail
+      checkoutService ! checkoutRequest
       serviceMsgMap(userService, FindUser(correctEmail), UserFound(existingUser))
       serviceMsgMap(cartService, GetCart(correctEmail), Cart(listOfItems))
       serviceMsgMap(warehouseServiceMock, CheckItemList(listOfItems), ItemsNotAvailable)

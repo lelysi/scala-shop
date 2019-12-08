@@ -7,9 +7,10 @@ import akka.http.scaladsl.server.Route
 import akka.testkit.TestProbe
 import lelysi.scalashop.{FunctionalTestSpec, JwtAuthentication, ShopApi}
 import lelysi.scalashop.model.{Email, PaymentAccount}
-import lelysi.scalashop.service.CheckoutService.CheckoutSuccess
+import lelysi.scalashop.service.CheckoutService.{CheckoutRequest, CheckoutSuccess}
 import lelysi.scalashop.service.paymentgate.Order
 import pdi.jwt.JwtClaim
+
 import scala.util.Try
 
 final class CheckoutSpec extends FunctionalTestSpec {
@@ -33,7 +34,7 @@ final class CheckoutSpec extends FunctionalTestSpec {
         addHeader(RawHeader("X-Api-Key", "example@example.com")) ~>
         Route.seal(MockApi.checkoutRoute())
 
-      serviceMsgMap(checkoutServiceMock, Email, CheckoutSuccess(new Order(PaymentAccount("any"), List())))
+      serviceMsgMap(checkoutServiceMock, CheckoutRequest(Email("example@example.com")), CheckoutSuccess(new Order(PaymentAccount("any"), List())))
 
       result ~> check {
         status shouldEqual StatusCodes.OK

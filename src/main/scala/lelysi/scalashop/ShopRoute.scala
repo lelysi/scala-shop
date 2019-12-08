@@ -10,7 +10,7 @@ import lelysi.scalashop.service.{CartService, CheckoutService, UserService, Ware
 import akka.pattern.ask
 import akka.util.Timeout
 import lelysi.scalashop.service.CartService.{ItemAddedToCart, ItemAddingResponse, ItemToCart, ItemWasNotFound}
-import lelysi.scalashop.service.CheckoutService.{CheckoutFail, CheckoutServiceResponse, CheckoutSuccess}
+import lelysi.scalashop.service.CheckoutService.{CheckoutFail, CheckoutRequest, CheckoutServiceResponse, CheckoutSuccess}
 import lelysi.scalashop.service.UserService.{AuthUser, EmailAlreadyUsed, IncorrectPassword, RegisterUser, UserAuthenticationResponse, UserFound, UserRegistered, UserRegistrationResponse, UserSearchResponse, UserUnknown}
 import lelysi.scalashop.service.WarehouseService.{AddItem, ItemAdded, WarehouseServiceAddItemResponse}
 import lelysi.scalashop.service.paymentgate.{FakePaymentGate, Order}
@@ -83,7 +83,7 @@ trait ShopRoute {
       post {
         headerValueByName("X-Api-Key") { token =>
           jwtAuthenticator.getDecodedClaim(token) match {
-            case Success(claimData) => onSuccess(checkout(Email(claimData.content))) {
+            case Success(claimData) => onSuccess(checkout(CheckoutRequest(Email(claimData.content)))) {
               case CheckoutSuccess(Order(uuid, _, _)) => complete(s"success, order nr $uuid")
               case CheckoutFail => complete(StatusCodes.BadRequest, s"error")
             }
@@ -114,8 +114,8 @@ trait ShopRoute {
   def addItemToCart(itemToCart: ItemToCart): Future[ItemAddingResponse] =
     cartService.ask(itemToCart).mapTo[ItemAddingResponse]
 
-  def checkout(email: Email): Future[CheckoutServiceResponse] =
-    checkoutService.ask(Email).mapTo[CheckoutServiceResponse]
+  def checkout(checkoutRequest: CheckoutRequest): Future[CheckoutServiceResponse] =
+    checkoutService.ask(checkoutRequest).mapTo[CheckoutServiceResponse]
 }
 
 class ShopApi(system: ActorSystem)(implicit val timeout: Timeout, implicit val config: Config) extends ShopRoute
