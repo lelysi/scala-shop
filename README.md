@@ -80,4 +80,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 * service has no frontend
 * service has no get urls yet
 * service uses travis-ci to run tests on each commit
-* service has continuous delivery - after each commit to master it builds and deploys new version on https://scala-shop.herokuapp.com/
+* service has continuous delivery - after each commit to master it builds and deploys new version on https://scala-shop.herokuapp.com/ (discontinued)
